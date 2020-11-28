@@ -13,12 +13,12 @@ export default function Routes() {
           headerShown: false,
         }}
       >
-        <Screen name="Home" component={Home} options={{ headerShown: false }} />
         <Screen
           name="Detalhes"
           component={Detalhes}
           options={{ headerShown: false }}
         />
+        <Screen name="Home" component={Home} options={{ headerShown: false }} />
       </Navigator>
     </NavigationContainer>
   );
