@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -14,7 +14,10 @@ import image1 from "../../images/001.png";
 import image2 from "../../images/002.png";
 import image3 from "../../images/003.png";
 import image4 from "../../images/004.png";
+import { usePokemon } from "../../hooks/ContextApi";
+import formatData from "../../utils/formatData";
 export default function Home() {
+  const { searchPokemon, pokemons } = usePokemon();
   const numColumn = 3;
   const data = [
     { key: image1 },
@@ -22,19 +25,11 @@ export default function Home() {
     { key: image3 },
     { key: image4 },
   ];
-  const formatData = (data, numColumn) => {
-    const numberOfFullRows = Math.floor(data.length / numColumn);
 
-    let numberOfElementsLastRow = data.length - numberOfFullRows * numColumn;
-    while (
-      numberOfElementsLastRow !== numColumn &&
-      numberOfElementsLastRow !== 0
-    ) {
-      data.push({ key: `blank ${numberOfElementsLastRow}`, empty: true });
-      numberOfElementsLastRow = numberOfElementsLastRow + 1;
-    }
-    return data;
-  };
+  useState(() => {
+    console.log(pokemons);
+  }, []);
+
   return (
     <>
       <View style={styles.header}>
@@ -51,6 +46,7 @@ export default function Home() {
             placeholderTextColor="#666360"
             autoCorrect={false}
             autoComplete={false}
+            onChangeText={(text) => searchPokemon({ name: text })}
           />
         </View>
         <FlatList
