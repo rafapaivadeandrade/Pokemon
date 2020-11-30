@@ -7,7 +7,9 @@ import {
   TextInput,
   FlatList,
   Dimensions,
+  TouchableOpacity,
 } from "react-native";
+import axios from "axios";
 import Logo from "../../images/pokemonlogo.png";
 import { Feather } from "@expo/vector-icons";
 import image1 from "../../images/001.png";
@@ -17,17 +19,23 @@ import image4 from "../../images/004.png";
 import { usePokemon } from "../../hooks/ContextApi";
 import formatData from "../../utils/formatData";
 export default function Home() {
-  const { searchPokemon, pokemons } = usePokemon();
+  const {
+    searchPokemon,
+    pokemons,
+    fetchData,
+    types,
+    setPokemons,
+  } = usePokemon();
   const numColumn = 3;
-  const data = [
-    { key: image1 },
-    { key: image2 },
-    { key: image3 },
-    { key: image4 },
-  ];
+  // const data = [
+  //   { key: image1 },
+  //   { key: image2 },
+  //   { key: image3 },
+  //   { key: image4 },
+  // ];
 
   useState(() => {
-    console.log(pokemons);
+    fetchData;
   }, []);
 
   return (
@@ -50,8 +58,9 @@ export default function Home() {
           />
         </View>
         <FlatList
-          data={formatData(data, numColumn)}
+          data={formatData(pokemons, numColumn)}
           style={styles.container}
+          keyExtractor={(pokemon) => String(pokemon.name)}
           showsVerticalScrollIndicator={false}
           onEndReachedThreshold={0.2}
           numColumns={numColumn}
@@ -60,17 +69,24 @@ export default function Home() {
               return <View style={[styles.itemInvisible]}></View>;
             } else {
               return (
-                <View style={styles.item}>
-                  <Text style={styles.number}># 1</Text>
-                  <Image source={data.key} style={styles.image} />
+                <TouchableOpacity style={styles.item}>
+                  <Text style={styles.number}># {index + 1}</Text>
+                  <Image
+                    source={{
+                      uri: `https://pokeres.bastionbot.org/images/pokemon/${
+                        index + 1
+                      }.png`,
+                    }}
+                    style={styles.image}
+                  />
 
                   <Text style={styles.itemLabel}>
-                    Name: <Text style={styles.pokemonInfo}>Bulbasaur</Text>
+                    Name: <Text style={styles.pokemonInfo}>{data.name}</Text>
                   </Text>
                   <Text style={styles.itemLabel}>
-                    Types: <Text style={styles.pokemonInfo}>Grass, Poison</Text>
+                    Types: <Text style={styles.pokemonInfo}></Text>
                   </Text>
-                </View>
+                </TouchableOpacity>
               );
             }
           }}

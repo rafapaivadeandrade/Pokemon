@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useState, useContext } from "react";
+import React, { createContext, useState, useContext } from "react";
 import axios from "axios";
 
 const PokemonContext = createContext({});
@@ -7,14 +7,24 @@ export const PokemonProvider = ({ children }) => {
   const [pokemons, setPokemons] = useState([]);
   const [loading, setLoading] = useState(false);
   const [pokemonFiltered, setPokemonFiltered] = useState([]);
+  const [types, setTypes] = useState([]);
+
   useState(() => {
-    const fetchData = async () => {
-      const response = await axios.get(`https://pokeapi.co/api/v2/pokemon/`);
-      setPokemons(response.data.results.name);
-    };
     fetchData();
   }, []);
-  // console.log(pokemons);
+  async function fetchData() {
+    const response = await axios.get(`https://pokeapi.co/api/v2/pokemon/`);
+    setPokemons(response.data.results);
+    response.data.results.map((pokemon) => {
+      axios
+        .get(`https://pokeapi.co/api/v2/pokemon/${pokemon.name}`)
+        .then((response) => {
+          Object.keys(response.data.types).map((key) => {
+            setTypes(response.data.types[key].type);
+          });
+        });
+    });
+  }
   async function searchPokemon({ name }) {
     try {
       setLoading(true);
@@ -40,6 +50,10 @@ export const PokemonProvider = ({ children }) => {
         loading,
         pokemonFiltered,
         pokemons,
+        fetchData,
+        types,
+        setPokemons,
+        setTypes,
       }}
     >
       {children}
