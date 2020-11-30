@@ -19,13 +19,8 @@ import image4 from "../../images/004.png";
 import { usePokemon } from "../../hooks/ContextApi";
 import formatData from "../../utils/formatData";
 export default function Home() {
-  const {
-    searchPokemon,
-    pokemons,
-    fetchData,
-    types,
-    setPokemons,
-  } = usePokemon();
+  const { searchPokemon, pokemons, fetchData, pokemonData } = usePokemon();
+  const [name, setName] = useState("");
   const numColumn = 3;
   // const data = [
   //   { key: image1 },
@@ -36,8 +31,7 @@ export default function Home() {
 
   useState(() => {
     fetchData;
-  }, []);
-
+  }, [pokemons]);
   return (
     <>
       <View style={styles.header}>
@@ -54,13 +48,13 @@ export default function Home() {
             placeholderTextColor="#666360"
             autoCorrect={false}
             autoComplete={false}
-            onChangeText={(text) => searchPokemon({ name: text })}
+            onChangeText={(text) => setName(text)}
           />
         </View>
         <FlatList
-          data={formatData(pokemons, numColumn)}
+          data={formatData(pokemonData, numColumn)}
           style={styles.container}
-          keyExtractor={(pokemon) => String(pokemon.name)}
+          keyExtractor={(pokemon, index) => index}
           showsVerticalScrollIndicator={false}
           onEndReachedThreshold={0.2}
           numColumns={numColumn}
@@ -70,12 +64,10 @@ export default function Home() {
             } else {
               return (
                 <TouchableOpacity style={styles.item}>
-                  <Text style={styles.number}># {index + 1}</Text>
+                  <Text style={styles.number}># {data.id}</Text>
                   <Image
                     source={{
-                      uri: `https://pokeres.bastionbot.org/images/pokemon/${
-                        index + 1
-                      }.png`,
+                      uri: data.sprites.front_default,
                     }}
                     style={styles.image}
                   />
@@ -84,7 +76,22 @@ export default function Home() {
                     Name: <Text style={styles.pokemonInfo}>{data.name}</Text>
                   </Text>
                   <Text style={styles.itemLabel}>
-                    Types: <Text style={styles.pokemonInfo}></Text>
+                    Types:
+                    {data.types.map((type, index) => {
+                      if (index === 0) {
+                        return (
+                          <Text style={styles.pokemonInfo}>
+                            {type.type.name},
+                          </Text>
+                        );
+                      } else {
+                        return (
+                          <Text style={styles.pokemonInfo}>
+                            {type.type.name}
+                          </Text>
+                        );
+                      }
+                    })}
                   </Text>
                 </TouchableOpacity>
               );
