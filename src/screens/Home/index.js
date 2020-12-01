@@ -8,8 +8,8 @@ import {
   FlatList,
   Dimensions,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import Logo from "../../images/pokemonlogo.png";
 import { Feather } from "@expo/vector-icons";
 import image1 from "../../images/001.png";
@@ -21,71 +21,74 @@ import formatData from "../../utils/formatData";
 import { useNavigation } from "@react-navigation/native";
 
 export default function Home() {
-  const { searchPokemon, fetchData, pokemonData } = usePokemon();
+  const {
+    searchPokemon,
+    fetchData,
+    pokemonData,
+    pokemonFiltered,
+    isSearched,
+  } = usePokemon();
   const [name, setName] = useState("");
   const numColumn = 3;
   const navigation = useNavigation();
 
   useState(() => {
     fetchData;
-  }, [pokemonData]);
+  }, []);
 
   async function goToPokemonDetails(id) {
-    await AsyncStorage.setItem("@id", String(id));
     navigation.navigate("Detalhes", { id: id });
   }
-
-  return (
-    <>
-      <View style={styles.header}>
-        <Image source={Logo} style={styles.logo} />
-        <Text style={styles.title}>POKEMON CHALLENGE</Text>
-        <View style={styles.invisibleContainer}></View>
-      </View>
-      <View style={styles.content}>
-        <View style={styles.searchView}>
-          <Feather name="search" size={24} color="#666360" />
-          <TextInput
-            style={styles.input}
-            placeholder="Type the Pokemon name"
-            placeholderTextColor="#666360"
-            autoCorrect={false}
-            autoComplete={false}
-            onChangeText={(text) => setName(text)}
-          />
+  if (isSearched) {
+    return (
+      <>
+        <View style={styles.header}>
+          <Image source={Logo} style={styles.logo} />
+          <Text style={styles.title}>POKEMON CHALLENGE</Text>
+          <View style={styles.invisibleContainer}></View>
         </View>
-        <FlatList
-          data={formatData(pokemonData, numColumn)}
-          style={styles.container}
-          keyExtractor={(pokemon, index) => index}
-          showsVerticalScrollIndicator={false}
-          onEndReachedThreshold={0.2}
-          numColumns={numColumn}
-          renderItem={({ item: data, index }) => {
-            if (data.empty === true) {
+        <View style={styles.content}>
+          <View style={styles.searchView}>
+            <Feather name="search" size={24} color="#666360" />
+            <TextInput
+              style={styles.input}
+              placeholder="Type the Pokemon name"
+              placeholderTextColor="#666360"
+              autoCorrect={false}
+              autoComplete={false}
+              onChangeText={(text) => searchPokemon({ name: text })}
+            />
+          </View>
+          {Object.keys(pokemonFiltered).map((key, index) => {
+            if (pokemonFiltered[key]?.id === undefined) {
               return <View style={[styles.itemInvisible]}></View>;
             } else {
               return (
                 <TouchableOpacity
-                  style={styles.item}
+                  key={index}
+                  style={styles.onlyItem}
                   onPress={() => {
-                    goToPokemonDetails(data.id);
+                    goToPokemonDetails(pokemonFiltered[key]?.id);
                   }}
                 >
-                  <Text style={styles.number}># {data.id}</Text>
+                  <Text style={styles.number}>
+                    # {pokemonFiltered[key]?.id}
+                  </Text>
                   <Image
                     source={{
-                      uri: data.sprites.front_default,
+                      uri: pokemonFiltered[key]?.sprites?.front_default,
                     }}
                     style={styles.image}
                   />
-
                   <Text style={styles.itemLabel}>
-                    Name: <Text style={styles.pokemonInfo}>{data.name}</Text>
+                    Name:{" "}
+                    <Text style={styles.pokemonInfo}>
+                      {pokemonFiltered[key]?.name}
+                    </Text>
                   </Text>
-                  <Text style={styles.itemLabel}>
+                  <Text style={styles.itemLabelSearched}>
                     Types:
-                    {data.types.map((type, index) => {
+                    {pokemonFiltered[key]?.types.map((type, index) => {
                       if (index === 0) {
                         return (
                           <Text key={type.type.name} style={styles.pokemonInfo}>
@@ -104,14 +107,109 @@ export default function Home() {
                 </TouchableOpacity>
               );
             }
-          }}
-        />
-      </View>
-    </>
-  );
+          })}
+        </View>
+      </>
+    );
+  } else {
+    return (
+      <>
+        <View style={styles.header}>
+          <Image source={Logo} style={styles.logo} />
+          <Text style={styles.title}>POKEMON CHALLENGE</Text>
+          <View style={styles.invisibleContainer}></View>
+        </View>
+        <View style={styles.content}>
+          <View style={styles.searchView}>
+            <Feather name="search" size={24} color="#666360" />
+            <TextInput
+              style={styles.input}
+              placeholder="Type the Pokemon name"
+              placeholderTextColor="#666360"
+              autoCorrect={false}
+              autoComplete={false}
+              onChangeText={(text) => searchPokemon({ name: text })}
+            />
+          </View>
+          <FlatList
+            data={formatData(pokemonData, numColumn)}
+            style={styles.container}
+            keyExtractor={(pokemon, index) => index}
+            showsVerticalScrollIndicator={false}
+            onEndReachedThreshold={0.2}
+            numColumns={numColumn}
+            renderItem={({ item: data, index }) => {
+              if (data.empty === true) {
+                return <View style={[styles.itemInvisible]}></View>;
+              } else {
+                return (
+                  <TouchableOpacity
+                    style={styles.item}
+                    onPress={() => {
+                      goToPokemonDetails(data.id);
+                    }}
+                  >
+                    <Text style={styles.number}># {data.id}</Text>
+                    <Image
+                      source={{
+                        uri: data.sprites.front_default,
+                      }}
+                      style={styles.image}
+                    />
+
+                    <Text style={styles.itemLabel}>
+                      Name: <Text style={styles.pokemonInfo}>{data.name}</Text>
+                    </Text>
+                    <Text style={styles.itemLabel}>
+                      Types:
+                      {data.types.map((type, index) => {
+                        if (index === 0) {
+                          return (
+                            <Text
+                              key={type.type.name}
+                              style={styles.pokemonInfo}
+                            >
+                              {type.type.name},
+                            </Text>
+                          );
+                        } else {
+                          return (
+                            <Text
+                              key={type.type.name}
+                              style={styles.pokemonInfo}
+                            >
+                              {type.type.name}
+                            </Text>
+                          );
+                        }
+                      })}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              }
+            }}
+          />
+        </View>
+      </>
+    );
+  }
 }
 
 const styles = StyleSheet.create({
+  onlyItem: {
+    backgroundColor: "#3E3B47",
+    flex: 1,
+    margin: 5,
+    paddingBottom: 50,
+    height: Dimensions.get("window").width / 3,
+    borderRadius: 10,
+    width: Dimensions.get("window").width / 3,
+  },
+  itemLabelSearched: {
+    width: 130,
+    color: "#ffffff",
+    marginHorizontal: 10,
+  },
   pokemonInfo: {
     color: "#FF9000",
   },

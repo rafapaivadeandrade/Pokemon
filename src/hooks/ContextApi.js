@@ -5,10 +5,10 @@ const PokemonContext = createContext({});
 
 export const PokemonProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
-  const [pokemonFiltered, setPokemonFiltered] = useState("");
+  const [pokemonFiltered, setPokemonFiltered] = useState([]);
   const [pokemonData, setPokemonData] = useState([]);
   const [specificPokemon, setSpecificPokemon] = useState([]);
-
+  const [isSearched, setIsSearched] = useState(false);
   useState(() => {
     fetchData();
   }, []);
@@ -25,7 +25,6 @@ export const PokemonProvider = ({ children }) => {
       })
     );
     setPokemonData(_pokemonData);
-    console.log(pokemonData);
   };
 
   async function getPokemon(url) {
@@ -35,46 +34,22 @@ export const PokemonProvider = ({ children }) => {
         .then((data) => resolve(data));
     });
   }
-  function searchPokemon({ name }) {
+
+  async function searchPokemon({ name }) {
     try {
-      setPokemonFiltered(name.toString());
-      let formatQuery = name.toLowerCase();
-      // console.log(formatQuery);
-      // let filteredPokemons = pokemons.map((pokemon) => {
-      //   console.log(pokemon);
-      //   if (pokemon.name.includes(name)) {
-      //     return pokemon.name;
-      //   }
-      // });
-      // // const filteredPokemons = pokemons.filter((pokemon) => {
-      // //   let pokemonLowerCase = pokemon.name.toLowerCase().trim();
-      // //   return pokemonLowerCase.indexOf(formatQuery) > -1;
-      // // });
-      // setPokemons(filteredPokemons);
-      // let filteredPokemons = Object.keys(pokemons).map((key) => {
-      //   // console.log(pokemons[key].name);
-      //   return pokemons[key].includes(formatQuery);
-      // });
-      // setPokemons(filteredPokemons);
-      // setPokemons((pokemons) =>
-      //   Object.keys(pokemons).map((key) => {
-      //     console.log(key);
-      //     return pokemons[key].includes(formatQuery);
-      //   })
-      // );
-      // setPokemons((pokemons) =>
-      //   Object.keys(pokemons).filter((p) => p.includes(formatQuery))
-      // );
-      // const pokemonSearched = pokemons.filter((pokemon) => {
-      //   return pokemon.name.includes(formatQuery);
-      // });
-      // setPokemons(pokemonSearched);
-      // setLoading(false);
-      // const response = await axios.get(
-      //   `https://pokeapi.co/api/v2/pokemon/${name}`
-      // );
-      // console.log(response.data.forms.name);
+      setIsSearched(false);
+      let formatQuery = name.toLowerCase().trim();
+
+      let pokemonRecord = await axios.get(
+        `https://pokeapi.co/api/v2/pokemon/${formatQuery}`
+      );
+      setPokemonFiltered(pokemonRecord);
+      setIsSearched(true);
+      if (name.length === 0) {
+        setIsSearched(false);
+      }
     } catch (err) {
+      setIsSearched(false);
       console.log(err);
     }
   }
@@ -95,6 +70,8 @@ export const PokemonProvider = ({ children }) => {
         fetchSpecificPokemon,
         specificPokemon,
         pokemonData,
+        setPokemonData,
+        isSearched,
       }}
     >
       {children}

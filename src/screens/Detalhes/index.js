@@ -8,9 +8,8 @@ import {
   Dimensions,
   ActivityIndicator,
 } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { usePokemon } from "../../hooks/ContextApi";
-import { ProgressDone, Progress, ProgressView } from "./styles";
+import { ProgressDone, Progress } from "./styles";
 import Logo from "../../images/pokemonlogo.png";
 import { Feather } from "@expo/vector-icons";
 import { BorderlessButton } from "react-native-gesture-handler";
@@ -39,115 +38,126 @@ export default function Detalhes({ route, navigation }) {
 
   useEffect(() => {
     fetchSpecificPokemon(id);
-    console.log(specificPokemon);
-
-    // console.log(specificPokemon.stats);
-    // console.log(specificPokemon.sprites.front_default);
+    console.log(loading);
   }, []);
-
-  return (
-    <>
-      <View style={styles.header}>
-        <Image source={Logo} style={styles.logo} />
-        <Text style={styles.title}>POKEMON CHALLENGE</Text>
-        <View style={styles.invisibleContainer}></View>
+  if (loading) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          backgroundColor: "#312E38",
+        }}
+      >
+        <ActivityIndicator size="large" color="ffffff" />
       </View>
-      <View style={styles.content}>
-        <View style={styles.back}>
-          <BorderlessButton
-            onPress={navigation.goBack}
-            style={{ height: 30, width: 30 }}
-          >
-            <Feather name="arrow-left" size={24} color="#FF9000" />
-          </BorderlessButton>
-
-          <Text style={styles.backText}>Back</Text>
+    );
+  } else {
+    return (
+      <>
+        <View style={styles.header}>
+          <Image source={Logo} style={styles.logo} />
+          <Text style={styles.title}>POKEMON CHALLENGE</Text>
+          <View style={styles.invisibleContainer}></View>
         </View>
+        <View style={styles.content}>
+          <View style={styles.back}>
+            <BorderlessButton
+              onPress={navigation.goBack}
+              style={{ height: 30, width: 30 }}
+            >
+              <Feather name="arrow-left" size={24} color="#FF9000" />
+            </BorderlessButton>
 
-        <View style={styles.selectedPokemon}>
-          <Text style={styles.selectedNumber}># {specificPokemon.id}</Text>
-          {/* <Image
-            source={{ uri: specificPokemon.sprites.front_default }}
-            style={styles.selectedImage}
-          /> */}
-          <Text style={styles.selectedName}>{specificPokemon.name}</Text>
-          <View style={styles.selectedSize}>
-            <View style={{ alignItems: "center" }}>
-              <Text style={styles.weight}>{specificPokemon.weight} KG</Text>
-              <Text style={styles.weightLabel}>Width</Text>
-            </View>
-            <View style={{ alignItems: "center" }}>
-              <Text style={styles.height}>{specificPokemon.height} M</Text>
-              <Text style={styles.heightLabel}>Height</Text>
-            </View>
+            <Text style={styles.backText}>Back</Text>
           </View>
-          <Text style={styles.stats}>Stats</Text>
-          {/* {specificPokemon.stats.map((pokemonInfo, index) => {
-            if (
-              pokemonInfo.stat.name === "special-attack" ||
-              pokemonInfo.stat.name === "special-defense"
-            ) {
-              return null;
-            }
-            return (
-              <View
-                key={index}
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  marginRight: 20,
-                }}
-              >
-                <Text
-                  key={index}
-                  style={{ color: "#ffffff", marginRight: 10, marginTop: 10 }}
-                >
-                  {(pokemonInfo.stat.name === "hp" && "HP") ||
-                    (pokemonInfo.stat.name === "attack" && "ATK") ||
-                    (pokemonInfo.stat.name === "defense" && "DEF") ||
-                    (pokemonInfo.stat.name === "speed" && "SPD")}
-                </Text>
-                <Progress>
-                  <ProgressDone width={pokemonInfo.base_stat}>
-                    <Text style={{ color: "#ffffff" }}>
-                      {pokemonInfo.base_stat}/100
-                    </Text>
-                  </ProgressDone>
-                </Progress>
-              </View>
-            );
-          })} */}
-        </View>
-        <Text style={styles.familyTree}>Family Tree</Text>
-        <FlatList
-          data={formatData(data, numColumn)}
-          showsVerticalScrollIndicator={false}
-          onEndReachedThreshold={0.2}
-          numColumns={numColumn}
-          renderItem={({ item: data, index }) => {
-            if (data.empty === true) {
-              return <View style={[styles.itemInvisible]}></View>;
-            } else {
-              return (
-                <View style={styles.item} key={index}>
-                  <Text style={styles.number}># 1</Text>
-                  <Image source={data.key} style={styles.image} />
 
-                  <Text style={styles.itemLabel}>
-                    Name: <Text style={styles.pokemonInfo}>Bulbasaur</Text>
+          <View style={styles.selectedPokemon}>
+            <Text style={styles.selectedNumber}># {specificPokemon.id}</Text>
+            <Image
+              source={{ uri: specificPokemon.sprites.front_default }}
+              style={styles.selectedImage}
+            />
+            <Text style={styles.selectedName}>{specificPokemon.name}</Text>
+            <View style={styles.selectedSize}>
+              <View style={{ alignItems: "center" }}>
+                <Text style={styles.weight}>{specificPokemon.weight} KG</Text>
+                <Text style={styles.weightLabel}>Width</Text>
+              </View>
+              <View style={{ alignItems: "center" }}>
+                <Text style={styles.height}>{specificPokemon.height} M</Text>
+                <Text style={styles.heightLabel}>Height</Text>
+              </View>
+            </View>
+            <Text style={styles.stats}>Stats</Text>
+            {specificPokemon.stats.map((pokemonInfo, index) => {
+              if (
+                pokemonInfo.stat.name === "special-attack" ||
+                pokemonInfo.stat.name === "special-defense"
+              ) {
+                return null;
+              }
+              return (
+                <View
+                  key={index}
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    marginRight: 20,
+                  }}
+                >
+                  <Text
+                    key={index}
+                    style={{ color: "#ffffff", marginRight: 10, marginTop: 10 }}
+                  >
+                    {(pokemonInfo.stat.name === "hp" && "HP") ||
+                      (pokemonInfo.stat.name === "attack" && "ATK") ||
+                      (pokemonInfo.stat.name === "defense" && "DEF") ||
+                      (pokemonInfo.stat.name === "speed" && "SPD")}
                   </Text>
-                  <Text style={styles.itemLabel}>
-                    Types: <Text style={styles.pokemonInfo}>Grass, Poison</Text>
-                  </Text>
+                  <Progress>
+                    <ProgressDone width={pokemonInfo.base_stat}>
+                      <Text style={{ color: "#ffffff" }}>
+                        {pokemonInfo.base_stat}/100
+                      </Text>
+                    </ProgressDone>
+                  </Progress>
                 </View>
               );
-            }
-          }}
-        />
-      </View>
-    </>
-  );
+            })}
+          </View>
+          <Text style={styles.familyTree}>Family Tree</Text>
+          <FlatList
+            data={formatData(data, numColumn)}
+            showsVerticalScrollIndicator={false}
+            onEndReachedThreshold={0.2}
+            numColumns={numColumn}
+            renderItem={({ item: data, index }) => {
+              if (data.empty === true) {
+                return <View style={[styles.itemInvisible]}></View>;
+              } else {
+                return (
+                  <View style={styles.item} key={index}>
+                    <Text style={styles.number}># 1</Text>
+                    <Image source={data.key} style={styles.image} />
+
+                    <Text style={styles.itemLabel}>
+                      Name: <Text style={styles.pokemonInfo}>Bulbasaur</Text>
+                    </Text>
+                    <Text style={styles.itemLabel}>
+                      Types:{" "}
+                      <Text style={styles.pokemonInfo}>Grass, Poison</Text>
+                    </Text>
+                  </View>
+                );
+              }
+            }}
+          />
+        </View>
+      </>
+    );
+  }
 }
 
 const styles = StyleSheet.create({
