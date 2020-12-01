@@ -8,22 +8,25 @@ import {
   Dimensions,
 } from "react-native";
 import { usePokemon } from "../../hooks/ContextApi";
-import { ProgressDone, Progress } from "./styles";
+import { ProgressDone, Progress } from "../../screens/Detalhes/styles";
 import Logo from "../../images/pokemonlogo.png";
+import { useNavigation } from "@react-navigation/native";
 import { Feather } from "@expo/vector-icons";
 import { BorderlessButton } from "react-native-gesture-handler";
 import image1 from "../../images/001.png";
 import image2 from "../../images/002.png";
 import formatData from "../../utils/formatData";
-export default function DetailedPokemon({ route, navigation }) {
-  const { specificPokemon, fetchSpecificPokemon } = usePokemon();
-  const { id } = route.params;
+export default function DetailedPokemon({ id }) {
+  const { specificPokemon, fetchSpecificPokemon, setLoading } = usePokemon();
+  const navigation = useNavigation();
+  // const { id } = route.params;
 
   const numColumn = 2;
   const data = [{ key: image1 }, { key: image2 }];
 
   useEffect(() => {
     fetchSpecificPokemon(id);
+    setLoading(false);
   }, []);
 
   return (
@@ -48,7 +51,7 @@ export default function DetailedPokemon({ route, navigation }) {
         <View style={styles.selectedPokemon}>
           <Text style={styles.selectedNumber}># {specificPokemon.id}</Text>
           <Image
-            source={{ uri: specificPokemon.sprites.front_default }}
+            source={{ uri: specificPokemon?.sprites?.front_default }}
             style={styles.selectedImage}
           />
           <Text style={styles.selectedName}>{specificPokemon.name}</Text>
@@ -63,7 +66,7 @@ export default function DetailedPokemon({ route, navigation }) {
             </View>
           </View>
           <Text style={styles.stats}>Stats</Text>
-          {specificPokemon.stats.map((pokemonInfo, index) => {
+          {specificPokemon?.stats.map((pokemonInfo, index) => {
             if (
               pokemonInfo.stat.name === "special-attack" ||
               pokemonInfo.stat.name === "special-defense"

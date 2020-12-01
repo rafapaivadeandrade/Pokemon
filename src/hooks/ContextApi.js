@@ -54,10 +54,16 @@ export const PokemonProvider = ({ children }) => {
     }
   }
   async function fetchSpecificPokemon(id) {
-    setLoading(true);
-    const response = await axios.get(`https://pokeapi.co/api/v2/pokemon/${id}`);
-    setSpecificPokemon(response.data);
-    setLoading(false);
+    try {
+      setLoading(true);
+      const response = await axios.get(
+        `https://pokeapi.co/api/v2/pokemon/${id}`
+      );
+      setSpecificPokemon(response.data);
+      setLoading(false);
+    } catch (err) {
+      setLoading(false);
+    }
   }
 
   return (
@@ -72,6 +78,7 @@ export const PokemonProvider = ({ children }) => {
         pokemonData,
         setPokemonData,
         isSearched,
+        setLoading,
       }}
     >
       {children}
