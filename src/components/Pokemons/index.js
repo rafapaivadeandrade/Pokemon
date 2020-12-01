@@ -39,6 +39,7 @@ export default function Pokemons() {
         <View style={styles.searchView}>
           <Feather name="search" size={24} color="#666360" />
           <TextInput
+            data-testid="search"
             style={styles.input}
             placeholder="Type the Pokemon name"
             placeholderTextColor="#666360"

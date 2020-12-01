@@ -2,6 +2,7 @@ import React, { useState } from "react";
 
 import { usePokemon } from "../../hooks/ContextApi";
 import { useNavigation } from "@react-navigation/native";
+import ActivityIndicatorView from "../../components/ActivityIndicatorView";
 import SearchedPokemon from "../../components/SearchedPokemon";
 import Pokemons from "../../components/Pokemons";
 

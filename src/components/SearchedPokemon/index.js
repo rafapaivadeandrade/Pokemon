@@ -45,7 +45,7 @@ export default function SearchedPokemon() {
         </View>
         {Object.keys(pokemonFiltered).map((key, index) => {
           if (pokemonFiltered[key]?.id === undefined) {
-            return <View style={[styles.itemInvisible]}></View>;
+            return <View key={index} style={styles.itemInvisible}></View>;
           } else {
             return (
               <TouchableOpacity
