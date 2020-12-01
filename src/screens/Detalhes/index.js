@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -6,7 +6,6 @@ import {
   Image,
   FlatList,
   Dimensions,
-  ActivityIndicator,
 } from "react-native";
 import { usePokemon } from "../../hooks/ContextApi";
 import { ProgressDone, Progress } from "./styles";
@@ -15,148 +14,23 @@ import { Feather } from "@expo/vector-icons";
 import { BorderlessButton } from "react-native-gesture-handler";
 import image1 from "../../images/001.png";
 import image2 from "../../images/002.png";
-import image3 from "../../images/003.png";
+import formatData from "../../utils/formatData";
+import ActivityIndicatorView from "../../components/ActivityIndicatorView";
+import DetailedPokemon from "../../components/DetailedPokemon";
 export default function Detalhes({ route, navigation }) {
   const { specificPokemon, fetchSpecificPokemon, loading } = usePokemon();
   const { id } = route.params;
 
   const numColumn = 2;
   const data = [{ key: image1 }, { key: image2 }];
-  const formatData = (data, numColumn) => {
-    const numberOfFullRows = Math.floor(data.length / numColumn);
-
-    let numberOfElementsLastRow = data.length - numberOfFullRows * numColumn;
-    while (
-      numberOfElementsLastRow !== numColumn &&
-      numberOfElementsLastRow !== 0
-    ) {
-      data.push({ key: `blank ${numberOfElementsLastRow}`, empty: true });
-      numberOfElementsLastRow = numberOfElementsLastRow + 1;
-    }
-    return data;
-  };
 
   useEffect(() => {
     fetchSpecificPokemon(id);
-    console.log(loading);
   }, []);
   if (loading) {
-    return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          backgroundColor: "#312E38",
-        }}
-      >
-        <ActivityIndicator size="large" color="ffffff" />
-      </View>
-    );
+    return <ActivityIndicatorView />;
   } else {
-    return (
-      <>
-        <View style={styles.header}>
-          <Image source={Logo} style={styles.logo} />
-          <Text style={styles.title}>POKEMON CHALLENGE</Text>
-          <View style={styles.invisibleContainer}></View>
-        </View>
-        <View style={styles.content}>
-          <View style={styles.back}>
-            <BorderlessButton
-              onPress={navigation.goBack}
-              style={{ height: 30, width: 30 }}
-            >
-              <Feather name="arrow-left" size={24} color="#FF9000" />
-            </BorderlessButton>
-
-            <Text style={styles.backText}>Back</Text>
-          </View>
-
-          <View style={styles.selectedPokemon}>
-            <Text style={styles.selectedNumber}># {specificPokemon.id}</Text>
-            <Image
-              source={{ uri: specificPokemon.sprites.front_default }}
-              style={styles.selectedImage}
-            />
-            <Text style={styles.selectedName}>{specificPokemon.name}</Text>
-            <View style={styles.selectedSize}>
-              <View style={{ alignItems: "center" }}>
-                <Text style={styles.weight}>{specificPokemon.weight} KG</Text>
-                <Text style={styles.weightLabel}>Width</Text>
-              </View>
-              <View style={{ alignItems: "center" }}>
-                <Text style={styles.height}>{specificPokemon.height} M</Text>
-                <Text style={styles.heightLabel}>Height</Text>
-              </View>
-            </View>
-            <Text style={styles.stats}>Stats</Text>
-            {specificPokemon.stats.map((pokemonInfo, index) => {
-              if (
-                pokemonInfo.stat.name === "special-attack" ||
-                pokemonInfo.stat.name === "special-defense"
-              ) {
-                return null;
-              }
-              return (
-                <View
-                  key={index}
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    marginRight: 20,
-                  }}
-                >
-                  <Text
-                    key={index}
-                    style={{ color: "#ffffff", marginRight: 10, marginTop: 10 }}
-                  >
-                    {(pokemonInfo.stat.name === "hp" && "HP") ||
-                      (pokemonInfo.stat.name === "attack" && "ATK") ||
-                      (pokemonInfo.stat.name === "defense" && "DEF") ||
-                      (pokemonInfo.stat.name === "speed" && "SPD")}
-                  </Text>
-                  <Progress>
-                    <ProgressDone width={pokemonInfo.base_stat}>
-                      <Text style={{ color: "#ffffff" }}>
-                        {pokemonInfo.base_stat}/100
-                      </Text>
-                    </ProgressDone>
-                  </Progress>
-                </View>
-              );
-            })}
-          </View>
-          <Text style={styles.familyTree}>Family Tree</Text>
-          <FlatList
-            data={formatData(data, numColumn)}
-            showsVerticalScrollIndicator={false}
-            onEndReachedThreshold={0.2}
-            numColumns={numColumn}
-            renderItem={({ item: data, index }) => {
-              if (data.empty === true) {
-                return <View style={[styles.itemInvisible]}></View>;
-              } else {
-                return (
-                  <View style={styles.item} key={index}>
-                    <Text style={styles.number}># 1</Text>
-                    <Image source={data.key} style={styles.image} />
-
-                    <Text style={styles.itemLabel}>
-                      Name: <Text style={styles.pokemonInfo}>Bulbasaur</Text>
-                    </Text>
-                    <Text style={styles.itemLabel}>
-                      Types:{" "}
-                      <Text style={styles.pokemonInfo}>Grass, Poison</Text>
-                    </Text>
-                  </View>
-                );
-              }
-            }}
-          />
-        </View>
-      </>
-    );
+    return <DetailedPokemon />;
   }
 }
 
