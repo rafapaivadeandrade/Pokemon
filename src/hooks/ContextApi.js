@@ -4,10 +4,10 @@ import axios from "axios";
 const PokemonContext = createContext({});
 
 export const PokemonProvider = ({ children }) => {
-  const [pokemons, setPokemons] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [pokemonFiltered, setPokemonFiltered] = useState("");
   const [pokemonData, setPokemonData] = useState([]);
+  const [specificPokemon, setSpecificPokemon] = useState([]);
 
   useState(() => {
     fetchData();
@@ -37,7 +37,6 @@ export const PokemonProvider = ({ children }) => {
   }
   function searchPokemon({ name }) {
     try {
-      setLoading(true);
       setPokemonFiltered(name.toString());
       let formatQuery = name.toLowerCase();
       // console.log(formatQuery);
@@ -79,6 +78,12 @@ export const PokemonProvider = ({ children }) => {
       console.log(err);
     }
   }
+  async function fetchSpecificPokemon(id) {
+    setLoading(true);
+    const response = await axios.get(`https://pokeapi.co/api/v2/pokemon/${id}`);
+    setSpecificPokemon(response.data);
+    setLoading(false);
+  }
 
   return (
     <PokemonContext.Provider
@@ -86,8 +91,9 @@ export const PokemonProvider = ({ children }) => {
         searchPokemon,
         loading,
         pokemonFiltered,
-        pokemons,
         fetchData,
+        fetchSpecificPokemon,
+        specificPokemon,
         pokemonData,
       }}
     >

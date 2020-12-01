@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -6,17 +6,20 @@ import {
   Image,
   FlatList,
   Dimensions,
+  ActivityIndicator,
 } from "react-native";
-import { ProgressDone, Progress } from "./styles";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { usePokemon } from "../../hooks/ContextApi";
+import { ProgressDone, Progress, ProgressView } from "./styles";
 import Logo from "../../images/pokemonlogo.png";
 import { Feather } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
 import { BorderlessButton } from "react-native-gesture-handler";
 import image1 from "../../images/001.png";
 import image2 from "../../images/002.png";
 import image3 from "../../images/003.png";
-export default function Detalhes() {
-  const navigation = useNavigation();
+export default function Detalhes({ route, navigation }) {
+  const { specificPokemon, fetchSpecificPokemon, loading } = usePokemon();
+  const { id } = route.params;
 
   const numColumn = 2;
   const data = [{ key: image1 }, { key: image2 }];
@@ -33,6 +36,15 @@ export default function Detalhes() {
     }
     return data;
   };
+
+  useEffect(() => {
+    fetchSpecificPokemon(id);
+    console.log(specificPokemon);
+
+    // console.log(specificPokemon.stats);
+    // console.log(specificPokemon.sprites.front_default);
+  }, []);
+
   return (
     <>
       <View style={styles.header}>
@@ -53,40 +65,59 @@ export default function Detalhes() {
         </View>
 
         <View style={styles.selectedPokemon}>
-          <Text style={styles.selectedNumber}># 2</Text>
-          <Image source={image3} style={styles.selectedImage} />
-          <Text style={styles.selectedName}>Bulbasaur</Text>
+          <Text style={styles.selectedNumber}># {specificPokemon.id}</Text>
+          {/* <Image
+            source={{ uri: specificPokemon.sprites.front_default }}
+            style={styles.selectedImage}
+          /> */}
+          <Text style={styles.selectedName}>{specificPokemon.name}</Text>
           <View style={styles.selectedSize}>
             <View style={{ alignItems: "center" }}>
-              <Text style={styles.weight}>69 KG</Text>
+              <Text style={styles.weight}>{specificPokemon.weight} KG</Text>
               <Text style={styles.weightLabel}>Width</Text>
             </View>
             <View style={{ alignItems: "center" }}>
-              <Text style={styles.height}>0.7 M</Text>
+              <Text style={styles.height}>{specificPokemon.height} M</Text>
               <Text style={styles.heightLabel}>Height</Text>
             </View>
           </View>
           <Text style={styles.stats}>Stats</Text>
-          <Progress>
-            <ProgressDone width={56}>
-              <Text style={{ color: "#ffffff" }}>56/100</Text>
-            </ProgressDone>
-          </Progress>
-          <Progress>
-            <ProgressDone width={56}>
-              <Text style={{ color: "#ffffff" }}>56/100</Text>
-            </ProgressDone>
-          </Progress>
-          <Progress>
-            <ProgressDone width={56}>
-              <Text style={{ color: "#ffffff" }}>56/100</Text>
-            </ProgressDone>
-          </Progress>
-          <Progress>
-            <ProgressDone width={56}>
-              <Text style={{ color: "#ffffff" }}>56/100</Text>
-            </ProgressDone>
-          </Progress>
+          {/* {specificPokemon.stats.map((pokemonInfo, index) => {
+            if (
+              pokemonInfo.stat.name === "special-attack" ||
+              pokemonInfo.stat.name === "special-defense"
+            ) {
+              return null;
+            }
+            return (
+              <View
+                key={index}
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginRight: 20,
+                }}
+              >
+                <Text
+                  key={index}
+                  style={{ color: "#ffffff", marginRight: 10, marginTop: 10 }}
+                >
+                  {(pokemonInfo.stat.name === "hp" && "HP") ||
+                    (pokemonInfo.stat.name === "attack" && "ATK") ||
+                    (pokemonInfo.stat.name === "defense" && "DEF") ||
+                    (pokemonInfo.stat.name === "speed" && "SPD")}
+                </Text>
+                <Progress>
+                  <ProgressDone width={pokemonInfo.base_stat}>
+                    <Text style={{ color: "#ffffff" }}>
+                      {pokemonInfo.base_stat}/100
+                    </Text>
+                  </ProgressDone>
+                </Progress>
+              </View>
+            );
+          })} */}
         </View>
         <Text style={styles.familyTree}>Family Tree</Text>
         <FlatList

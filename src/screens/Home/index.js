@@ -9,7 +9,7 @@ import {
   Dimensions,
   TouchableOpacity,
 } from "react-native";
-import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import Logo from "../../images/pokemonlogo.png";
 import { Feather } from "@expo/vector-icons";
 import image1 from "../../images/001.png";
@@ -18,20 +18,23 @@ import image3 from "../../images/003.png";
 import image4 from "../../images/004.png";
 import { usePokemon } from "../../hooks/ContextApi";
 import formatData from "../../utils/formatData";
+import { useNavigation } from "@react-navigation/native";
+
 export default function Home() {
-  const { searchPokemon, pokemons, fetchData, pokemonData } = usePokemon();
+  const { searchPokemon, fetchData, pokemonData } = usePokemon();
   const [name, setName] = useState("");
   const numColumn = 3;
-  // const data = [
-  //   { key: image1 },
-  //   { key: image2 },
-  //   { key: image3 },
-  //   { key: image4 },
-  // ];
+  const navigation = useNavigation();
 
   useState(() => {
     fetchData;
-  }, [pokemons]);
+  }, [pokemonData]);
+
+  async function goToPokemonDetails(id) {
+    await AsyncStorage.setItem("@id", String(id));
+    navigation.navigate("Detalhes", { id: id });
+  }
+
   return (
     <>
       <View style={styles.header}>
@@ -63,7 +66,12 @@ export default function Home() {
               return <View style={[styles.itemInvisible]}></View>;
             } else {
               return (
-                <TouchableOpacity style={styles.item}>
+                <TouchableOpacity
+                  style={styles.item}
+                  onPress={() => {
+                    goToPokemonDetails(data.id);
+                  }}
+                >
                   <Text style={styles.number}># {data.id}</Text>
                   <Image
                     source={{
@@ -80,13 +88,13 @@ export default function Home() {
                     {data.types.map((type, index) => {
                       if (index === 0) {
                         return (
-                          <Text style={styles.pokemonInfo}>
+                          <Text key={type.type.name} style={styles.pokemonInfo}>
                             {type.type.name},
                           </Text>
                         );
                       } else {
                         return (
-                          <Text style={styles.pokemonInfo}>
+                          <Text key={type.type.name} style={styles.pokemonInfo}>
                             {type.type.name}
                           </Text>
                         );
