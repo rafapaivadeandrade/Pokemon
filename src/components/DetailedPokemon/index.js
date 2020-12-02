@@ -17,7 +17,12 @@ import image1 from "../../images/001.png";
 import image2 from "../../images/002.png";
 import formatData from "../../utils/formatData";
 export default function DetailedPokemon({ id }) {
-  const { specificPokemon, fetchSpecificPokemon, setLoading } = usePokemon();
+  const {
+    specificPokemon,
+    fetchSpecificPokemon,
+    setLoading,
+    pokemonFamily,
+  } = usePokemon();
   const navigation = useNavigation();
   // const { id } = route.params;
 
@@ -25,7 +30,6 @@ export default function DetailedPokemon({ id }) {
   const data = [{ key: image1 }, { key: image2 }];
 
   useEffect(() => {
-    fetchSpecificPokemon(id);
     setLoading(false);
   }, []);
 
@@ -105,24 +109,44 @@ export default function DetailedPokemon({ id }) {
         </View>
         <Text style={styles.familyTree}>Family Tree</Text>
         <FlatList
-          data={formatData(data, numColumn)}
+          data={formatData(pokemonFamily, numColumn)}
           showsVerticalScrollIndicator={false}
+          keyExtractor={(pokemon, index) => index}
           onEndReachedThreshold={0.2}
           numColumns={numColumn}
           renderItem={({ item: data, index }) => {
             if (data.empty === true) {
-              return <View style={[styles.itemInvisible]}></View>;
+              return <View key={index} style={[styles.itemInvisible]}></View>;
             } else {
               return (
                 <View style={styles.item} key={index}>
-                  <Text style={styles.number}># 1</Text>
-                  <Image source={data.key} style={styles.image} />
+                  <Text style={styles.number}># {data?.id}</Text>
+                  <Image
+                    source={{ uri: data?.sprites?.front_default }}
+                    style={styles.image}
+                  />
 
                   <Text style={styles.itemLabel}>
-                    Name: <Text style={styles.pokemonInfo}>Bulbasaur</Text>
+                    Name: <Text style={styles.pokemonInfo}>{data?.name}</Text>
                   </Text>
                   <Text style={styles.itemLabel}>
-                    Types: <Text style={styles.pokemonInfo}>Grass, Poison</Text>
+                    Types:
+                    {data.types.map((type, index) => {
+                      if (index >= 0) {
+                        return (
+                          <Text key={type.type.name} style={styles.pokemonInfo}>
+                            {type.type.name} ,
+                          </Text>
+                        );
+                      }
+                      if (index === 0) {
+                        return (
+                          <Text key={type.type.name} style={styles.pokemonInfo}>
+                            {type.type.name}
+                          </Text>
+                        );
+                      }
+                    })}
                   </Text>
                 </View>
               );

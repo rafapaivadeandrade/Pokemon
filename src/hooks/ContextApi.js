@@ -9,6 +9,8 @@ export const PokemonProvider = ({ children }) => {
   const [pokemonData, setPokemonData] = useState([]);
   const [specificPokemon, setSpecificPokemon] = useState([]);
   const [isSearched, setIsSearched] = useState(false);
+  const [pokemonFamily, setPokemonFamily] = useState([]);
+  // let [rowId, setRowId] = useState(0);
   useState(() => {
     fetchData();
   }, []);
@@ -54,6 +56,7 @@ export const PokemonProvider = ({ children }) => {
     }
   }
   async function fetchSpecificPokemon(id) {
+    fetchPokemonFamily(id);
     try {
       setLoading(true);
       const response = await axios.get(
@@ -63,6 +66,60 @@ export const PokemonProvider = ({ children }) => {
       setLoading(false);
     } catch (err) {
       setLoading(false);
+    }
+  }
+  async function fetchPokemonFamily(id) {
+    if (id % 3 === 1) {
+      console.log(id + "primeiro pokemon");
+      let rowId = 0;
+      try {
+        switch (id) {
+          case 1:
+            rowId = 1;
+            break;
+          case 4:
+            rowId = 2;
+            break;
+          case 7:
+            rowId = 3;
+            break;
+          case 10:
+            rowId = 4;
+            break;
+          case 13:
+            rowId = 5;
+            break;
+          case 16:
+            rowId = 6;
+            break;
+          case 19:
+            rowId = 7;
+            break;
+          default:
+            break;
+        }
+        console.log(rowId);
+        const response = await axios.get(
+          `https://pokeapi.co/api/v2/evolution-chain/${rowId}`
+        );
+        const firstEvolutionData = await axios.get(
+          `https://pokeapi.co/api/v2/pokemon/${response.data.chain.evolves_to[0].species.name}`
+        );
+        if (rowId !== 7) {
+          const secondEvolutionData = await axios.get(
+            `https://pokeapi.co/api/v2/pokemon/${response.data.chain.evolves_to[0].evolves_to[0].species.name}`
+          );
+          setPokemonFamily([firstEvolutionData.data, secondEvolutionData.data]);
+        } else {
+          setPokemonFamily([firstEvolutionData.data]);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    } else if (id % 3 !== 1 && id % 3 === 0) {
+      console.log(id + "terceiro pokemon");
+    } else {
+      console.log(id + "segundo pokemon");
     }
   }
 
@@ -76,6 +133,7 @@ export const PokemonProvider = ({ children }) => {
         fetchSpecificPokemon,
         specificPokemon,
         pokemonData,
+        pokemonFamily,
         setPokemonData,
         isSearched,
         setLoading,

@@ -4,12 +4,7 @@ import { useNavigation } from "@react-navigation/native";
 import ActivityIndicatorView from "../../components/ActivityIndicatorView";
 import DetailedPokemon from "../../components/DetailedPokemon";
 export default function Detalhes({ route }) {
-  const {
-    specificPokemon,
-    fetchSpecificPokemon,
-    loading,
-    setLoading,
-  } = usePokemon();
+  const { fetchSpecificPokemon, loading } = usePokemon();
   const { id } = route.params;
 
   useEffect(() => {
