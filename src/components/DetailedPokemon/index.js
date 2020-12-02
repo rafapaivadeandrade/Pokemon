@@ -13,21 +13,12 @@ import Logo from "../../images/pokemonlogo.png";
 import { useNavigation } from "@react-navigation/native";
 import { Feather } from "@expo/vector-icons";
 import { BorderlessButton } from "react-native-gesture-handler";
-import image1 from "../../images/001.png";
-import image2 from "../../images/002.png";
 import formatData from "../../utils/formatData";
 export default function DetailedPokemon({ id }) {
-  const {
-    specificPokemon,
-    fetchSpecificPokemon,
-    setLoading,
-    pokemonFamily,
-  } = usePokemon();
+  const { specificPokemon, setLoading, pokemonFamily } = usePokemon();
   const navigation = useNavigation();
-  // const { id } = route.params;
 
   const numColumn = 2;
-  const data = [{ key: image1 }, { key: image2 }];
 
   useEffect(() => {
     setLoading(false);
