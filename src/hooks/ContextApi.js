@@ -98,7 +98,6 @@ export const PokemonProvider = ({ children }) => {
           default:
             break;
         }
-        console.log(rowId);
         const response = await axios.get(
           `https://pokeapi.co/api/v2/evolution-chain/${rowId}`
         );
@@ -119,7 +118,46 @@ export const PokemonProvider = ({ children }) => {
     } else if (id % 3 !== 1 && id % 3 === 0) {
       console.log(id + "terceiro pokemon");
     } else {
+      let rowId = 0;
       console.log(id + "segundo pokemon");
+      const response = await axios.get(
+        `https://pokeapi.co/api/v2/pokemon-species/${id}`
+      );
+      const firstEvolutionData = await axios.get(
+        `https://pokeapi.co/api/v2/pokemon/${response.data.evolves_from_species.name}`
+      );
+      switch (firstEvolutionData.data.id) {
+        case 1:
+          rowId = 1;
+          break;
+        case 4:
+          rowId = 2;
+          break;
+        case 7:
+          rowId = 3;
+          break;
+        case 10:
+          rowId = 4;
+          break;
+        case 13:
+          rowId = 5;
+          break;
+        case 16:
+          rowId = 6;
+          break;
+        case 19:
+          rowId = 7;
+          break;
+        default:
+          break;
+      }
+      const chainResponse = await axios.get(
+        `https://pokeapi.co/api/v2/evolution-chain/${rowId}`
+      );
+      const secondEvolutionData = await axios.get(
+        `https://pokeapi.co/api/v2/pokemon/${chainResponse.data.chain.evolves_to[0].evolves_to[0].species.name}`
+      );
+      setPokemonFamily([firstEvolutionData.data, secondEvolutionData.data]);
     }
   }
 
