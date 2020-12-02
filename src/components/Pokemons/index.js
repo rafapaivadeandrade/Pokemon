@@ -4,19 +4,17 @@ import {
   Text,
   View,
   Image,
-  TextInput,
   FlatList,
   Dimensions,
   TouchableOpacity,
 } from "react-native";
-import Logo from "../../images/pokemonlogo.png";
-import { Feather } from "@expo/vector-icons";
 import { usePokemon } from "../../hooks/ContextApi";
 import { useNavigation } from "@react-navigation/native";
 import formatData from "../../utils/formatData";
-
+import Header from "../Header";
+import SearchBar from "../SearchBar";
 export default function Pokemons() {
-  const { searchPokemon, fetchData, pokemonData } = usePokemon();
+  const { fetchData, pokemonData } = usePokemon();
   const numColumn = 3;
   const navigation = useNavigation();
 
@@ -30,24 +28,9 @@ export default function Pokemons() {
 
   return (
     <>
-      <View style={styles.header}>
-        <Image source={Logo} style={styles.logo} />
-        <Text style={styles.title}>POKEMON CHALLENGE</Text>
-        <View style={styles.invisibleContainer}></View>
-      </View>
+      <Header />
       <View style={styles.content}>
-        <View style={styles.searchView}>
-          <Feather name="search" size={24} color="#666360" />
-          <TextInput
-            data-testid="search"
-            style={styles.input}
-            placeholder="Type the Pokemon name"
-            placeholderTextColor="#666360"
-            autoCorrect={false}
-            autoComplete={false}
-            onChangeText={(text) => searchPokemon({ name: text })}
-          />
-        </View>
+        <SearchBar />
         <FlatList
           data={formatData(pokemonData, numColumn)}
           style={styles.container}
@@ -80,10 +63,10 @@ export default function Pokemons() {
                   <Text style={styles.itemLabel}>
                     Types:
                     {data.types.map((type, index) => {
-                      if (index >= 0) {
+                      if (index > 0) {
                         return (
                           <Text key={type.type.name} style={styles.pokemonInfo}>
-                            {type.type.name} ,
+                            ,{type.type.name}
                           </Text>
                         );
                       }
@@ -139,65 +122,16 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     marginTop: -20,
   },
-  header: {
-    backgroundColor: "#28262E",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    elevation: 0,
-    shadowOpacity: 0,
-    borderBottomWidth: 0,
-    paddingLeft: 24,
-    paddingRight: 34,
-    paddingTop: 15,
-    paddingBottom: 20,
-  },
-  input: {
-    color: "#666360",
-    height: 50,
-    backgroundColor: "#28262E",
-    borderRadius: 10,
-    width: 300,
-    maxWidth: 400,
-    paddingHorizontal: 10,
-    fontSize: 16,
-    borderBottomWidth: 0,
-  },
-  invisibleContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#ffffff",
-  },
-  logo: {
-    height: 50,
-    width: 50,
-    tintColor: "#666360",
-  },
   content: {
     flex: 1,
     backgroundColor: "#312E38",
   },
-  searchView: {
-    alignSelf: "center",
-    marginTop: 20,
-    height: 60,
-    width: "95%",
-    backgroundColor: "#28262E",
-    paddingHorizontal: 20,
-    alignItems: "center",
-    flexDirection: "row",
-    borderRadius: 20,
-  },
+
   container: {
     marginVertical: 20,
     flex: 1,
   },
   item: {
-    // marginHorizontal: 10,
     backgroundColor: "#3E3B47",
     justifyContent: "center",
     flex: 1,

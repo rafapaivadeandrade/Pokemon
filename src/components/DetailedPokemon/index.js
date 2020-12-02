@@ -9,11 +9,11 @@ import {
 } from "react-native";
 import { usePokemon } from "../../hooks/ContextApi";
 import { ProgressDone, Progress } from "../../screens/Detalhes/styles";
-import Logo from "../../images/pokemonlogo.png";
 import { useNavigation } from "@react-navigation/native";
 import { Feather } from "@expo/vector-icons";
 import { BorderlessButton } from "react-native-gesture-handler";
 import formatData from "../../utils/formatData";
+import Header from "../Header";
 export default function DetailedPokemon({ id }) {
   const { specificPokemon, setLoading, pokemonFamily } = usePokemon();
   const navigation = useNavigation();
@@ -26,11 +26,7 @@ export default function DetailedPokemon({ id }) {
 
   return (
     <>
-      <View style={styles.header}>
-        <Image source={Logo} style={styles.logo} />
-        <Text style={styles.title}>POKEMON CHALLENGE</Text>
-        <View style={styles.invisibleContainer}></View>
-      </View>
+      <Header />
       <View style={styles.content}>
         <View style={styles.back}>
           <BorderlessButton
@@ -123,10 +119,10 @@ export default function DetailedPokemon({ id }) {
                   <Text style={styles.itemLabel}>
                     Types:{" "}
                     {data.types.map((type, index) => {
-                      if (index >= 0) {
+                      if (index > 0) {
                         return (
                           <Text key={type.type.name} style={styles.pokemonInfo}>
-                            {type.type.name} ,
+                            ,{type.type.name}
                           </Text>
                         );
                       }
@@ -235,34 +231,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     marginTop: -20,
   },
-  header: {
-    backgroundColor: "#28262E",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    elevation: 0,
-    shadowOpacity: 0,
-    borderBottomWidth: 0,
-    paddingLeft: 24,
-    paddingRight: 34,
-    paddingTop: 15,
-    paddingBottom: 20,
-  },
 
-  invisibleContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#ffffff",
-  },
-  logo: {
-    height: 50,
-    width: 50,
-    tintColor: "#666360",
-  },
   content: {
     flex: 1,
     backgroundColor: "#312E38",
