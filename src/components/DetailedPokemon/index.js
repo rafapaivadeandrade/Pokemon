@@ -130,7 +130,7 @@ export default function DetailedPokemon({ id }) {
                     Name: <Text style={styles.pokemonInfo}>{data?.name}</Text>
                   </Text>
                   <Text style={styles.itemLabel}>
-                    Types:
+                    Types:{" "}
                     {data.types.map((type, index) => {
                       if (index >= 0) {
                         return (

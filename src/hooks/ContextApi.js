@@ -70,7 +70,6 @@ export const PokemonProvider = ({ children }) => {
   }
   async function fetchPokemonFamily(id) {
     if (id % 3 === 1) {
-      console.log(id + "primeiro pokemon");
       let rowId = 0;
       try {
         switch (id) {
@@ -116,10 +115,21 @@ export const PokemonProvider = ({ children }) => {
         console.log(err);
       }
     } else if (id % 3 !== 1 && id % 3 === 0) {
-      console.log(id + "terceiro pokemon");
+      const response = await axios.get(
+        `https://pokeapi.co/api/v2/pokemon-species/${id}`
+      );
+      const firstEvolutionData = await axios.get(
+        `https://pokeapi.co/api/v2/pokemon/${response.data.evolves_from_species.name}`
+      );
+      const secondResponse = await axios.get(
+        `https://pokeapi.co/api/v2/pokemon-species/${firstEvolutionData.data.id}`
+      );
+      const secondEvolutionData = await axios.get(
+        `https://pokeapi.co/api/v2/pokemon/${secondResponse.data.evolves_from_species.name}`
+      );
+      setPokemonFamily([secondEvolutionData.data, firstEvolutionData.data]);
     } else {
       let rowId = 0;
-      console.log(id + "segundo pokemon");
       const response = await axios.get(
         `https://pokeapi.co/api/v2/pokemon-species/${id}`
       );
@@ -154,10 +164,14 @@ export const PokemonProvider = ({ children }) => {
       const chainResponse = await axios.get(
         `https://pokeapi.co/api/v2/evolution-chain/${rowId}`
       );
-      const secondEvolutionData = await axios.get(
-        `https://pokeapi.co/api/v2/pokemon/${chainResponse.data.chain.evolves_to[0].evolves_to[0].species.name}`
-      );
-      setPokemonFamily([firstEvolutionData.data, secondEvolutionData.data]);
+      try {
+        const secondEvolutionData = await axios.get(
+          `https://pokeapi.co/api/v2/pokemon/${chainResponse.data.chain.evolves_to[0].evolves_to[0].species.name}`
+        );
+        setPokemonFamily([firstEvolutionData.data, secondEvolutionData.data]);
+      } catch (err) {
+        setPokemonFamily([firstEvolutionData.data]);
+      }
     }
   }
 
