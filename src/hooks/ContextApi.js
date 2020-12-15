@@ -10,7 +10,7 @@ export const PokemonProvider = ({ children }) => {
   const [specificPokemon, setSpecificPokemon] = useState([]);
   const [isSearched, setIsSearched] = useState(false);
   const [pokemonFamily, setPokemonFamily] = useState([]);
-  // let [rowId, setRowId] = useState(0);
+
   useState(() => {
     fetchData();
   }, []);
@@ -72,6 +72,8 @@ export const PokemonProvider = ({ children }) => {
     if (id % 3 === 1) {
       let rowId = 0;
       try {
+        setLoading(true);
+
         switch (id) {
           case 1:
             rowId = 1;
@@ -108,8 +110,10 @@ export const PokemonProvider = ({ children }) => {
             `https://pokeapi.co/api/v2/pokemon/${response.data.chain.evolves_to[0].evolves_to[0].species.name}`
           );
           setPokemonFamily([firstEvolutionData.data, secondEvolutionData.data]);
+          setLoading(false);
         } else {
           setPokemonFamily([firstEvolutionData.data]);
+          setLoading(false);
         }
       } catch (err) {
         console.log(err);
@@ -128,6 +132,7 @@ export const PokemonProvider = ({ children }) => {
         `https://pokeapi.co/api/v2/pokemon/${secondResponse.data.evolves_from_species.name}`
       );
       setPokemonFamily([secondEvolutionData.data, firstEvolutionData.data]);
+      setLoading(false);
     } else {
       let rowId = 0;
       const response = await axios.get(
@@ -169,8 +174,10 @@ export const PokemonProvider = ({ children }) => {
           `https://pokeapi.co/api/v2/pokemon/${chainResponse.data.chain.evolves_to[0].evolves_to[0].species.name}`
         );
         setPokemonFamily([firstEvolutionData.data, secondEvolutionData.data]);
+        setLoading(false);
       } catch (err) {
         setPokemonFamily([firstEvolutionData.data]);
+        setLoading(false);
       }
     }
   }
@@ -189,6 +196,7 @@ export const PokemonProvider = ({ children }) => {
         setPokemonData,
         isSearched,
         setLoading,
+        setIsSearched,
       }}
     >
       {children}

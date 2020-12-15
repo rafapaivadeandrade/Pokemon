@@ -14,11 +14,21 @@ import { Feather } from "@expo/vector-icons";
 import { BorderlessButton } from "react-native-gesture-handler";
 import formatData from "../../utils/formatData";
 import Header from "../Header";
-export default function DetailedPokemon({ id }) {
-  const { specificPokemon, setLoading, pokemonFamily } = usePokemon();
+export default function DetailedPokemon() {
+  const {
+    specificPokemon,
+    setLoading,
+    pokemonFamily,
+    setIsSearched,
+  } = usePokemon();
   const navigation = useNavigation();
 
   const numColumn = 2;
+
+  function goBack() {
+    setIsSearched(false);
+    navigation.goBack();
+  }
 
   useEffect(() => {
     setLoading(false);
@@ -30,7 +40,7 @@ export default function DetailedPokemon({ id }) {
       <View style={styles.content}>
         <View style={styles.back}>
           <BorderlessButton
-            onPress={navigation.goBack}
+            onPress={() => goBack()}
             style={{ height: 30, width: 30 }}
           >
             <Feather name="arrow-left" size={24} color="#FF9000" />
